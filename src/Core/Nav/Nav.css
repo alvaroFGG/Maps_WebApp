@@ -1,8 +1,6 @@
 header{
     background-color: #383D2F;
-    position: sticky;
-    z-index: 999;
-    top: -10px;
+    width: 100%;
     box-shadow: 0 -6px 10px 5px rgba(0,0,0,0.7);
 }
 
