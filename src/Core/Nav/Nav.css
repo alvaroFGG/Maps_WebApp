@@ -1,0 +1,22 @@
+header{
+    background-color: #383D2F;
+    position: sticky;
+    z-index: 999;
+    top: -10px;
+    box-shadow: 0 -6px 10px 5px rgba(0,0,0,0.7);
+}
+
+.title{
+    color: #DEA85D;
+}
+
+.menu__option--1{
+    border-right: 1px solid #DEA85D;
+    padding-right: 20px;
+}
+
+.menu__option:hover{
+    color: #DEA85D;
+    cursor: pointer;
+    transition: all 0.3s;
+}
