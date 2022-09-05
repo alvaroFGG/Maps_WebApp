@@ -1,0 +1,10 @@
+.homeMap{
+    /* text-align: center; */
+}
+
+.newMarkerBtn{
+    background-color: #383D2F;
+    position:absolute;
+    z-index: 999;
+    transform: translateY(100px);
+}
