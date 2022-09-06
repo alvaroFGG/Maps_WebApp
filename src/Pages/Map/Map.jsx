@@ -1,11 +1,12 @@
 import React from 'react';
-import { MapContainer, TileLayer,Marker, useMapEvent, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer,Marker, useMapEvent } from 'react-leaflet';
 import L from 'leaflet';
 import { useState, useEffect, useRef } from 'react';
 import MyPopup from '../../Components/MyPopup/MyPopup';
 import './Map.css';
 import AddLocationAltIcon from '@mui/icons-material/AddLocationAlt';
 import useGeoLocation from '../../Hooks/useGeoLocation';
+import Swal from 'sweetalert2';
 
 
 const Map = () => {
@@ -16,7 +17,7 @@ const Map = () => {
 
   const [markers, setMarkers] = useState();
   const mapRef = useRef();
-  const location = useGeoLocation();
+  const location = useGeoLocation(); //custom hook for location 
 
   useEffect(() => {
     fetch(URL)
@@ -25,9 +26,16 @@ const Map = () => {
   }, [])
 
   
-  const getIcon = (iconSize) => {
+  const getTemporalIcon = (iconSize) => {
     return L.icon({
       iconUrl: require('../../Assets/img/temporal-waypoint.jpeg'),
+      iconSize: iconSize
+    })
+  }
+
+  const getLocationIcon = (iconSize) => {
+    return L.icon({
+      iconUrl: require('../../Assets/img/geolocation-marker.png'),
       iconSize: iconSize
     })
   }
@@ -37,26 +45,51 @@ const Map = () => {
       const map = useMapEvent({
         click: (e) => {
           const {lat, lng} = e.latlng;
-            L.marker([lat, lng], {icon: getIcon(35)}).bindPopup('Posición temporal').addTo(map);
+            L.marker([lat, lng], {icon: getTemporalIcon(35)}).bindPopup('Posición temporal').addTo(map);
         }
       });
     return null;
   }
 
+
   //function for adding new markers
-  const addLocationMarker = (e) => {
+  const addLocationMarker =  () => {
+    if (window.confirm("¿Quieres añadir tu ubicacion como un punto nuevo?")){
+      if (location.loaded && !location.error ) {
+          
+        mapRef.current.flyTo(
+          [location.coordinates.lat, location.coordinates.lng],
+          ZOOM,
+          { animate: true }
+        );
 
-    console.log(mapRef.current);
-    if (location.loaded && !location.error) {
-      mapRef.current.flyTo(
-        [location.coordinates.lat, location.coordinates.lng],
-        ZOOM,
-        { animate: true }
-      );
-    } else {
-      alert(location.error.message);
+
+        Swal.fire({
+          title: 'Nuevo Marcador',
+          html: `<input type="text" id="name" class="swal2-input" placeholder="Nombre del punto">
+                <select id="type">
+                  <option value="bebedero">Bebedero</option>
+                  <option value="comedero">Comedero</option>
+                </select>`,
+          confirmButtonText: 'Confirmar',
+          showCancelButton: true,
+          cancelButtonText: 'Cancelar',
+          focusConfirm: false,
+          preConfirm: () => {
+            const name = Swal.getPopup().querySelector('#name').value
+            const type = Swal.getPopup().querySelector('#type').value
+            if (!name || !type) {
+              Swal.showValidationMessage(`Por favor, introduce todos los valores`)
+            }
+            return { name: name, type: type }
+          }
+        }).then((result) => {
+            console.log(result.value);
+        })
+        
+        
+      }   
     }
-
   }
   
 
@@ -81,6 +114,7 @@ const Map = () => {
                     location.coordinates.lat,
                     location.coordinates.lng,
                   ]}
+                  icon={getLocationIcon(50)}
                 ></Marker>
               )}
             
